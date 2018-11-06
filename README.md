@@ -6,7 +6,7 @@ This tool maps from a structured data source (e.g. CSV or JSON-lines) to a graph
 
 To run the tool, use the following command:
 
-	java -cp mapper-1.0.jar uk.gov.nca.graph.mapper.cli.MapDataToGraph
+	java -cp mapper-1.1.jar uk.gov.nca.graph.mapper.cli.MapDataToGraph
 
 This will display a help message detailing the different command line options. Some of these command line options are required, and the help message is displayed if these aren't provided.
 The full list of options is as follows.
@@ -26,11 +26,11 @@ The full list of options is as follows.
 
 An example full command would therefore be as follows:
 
-	java -cp mapper-1.0.jar uk.gov.nca.graph.mapper.cli.MapDataToGraph -c example/companies/companies.map -d example/companies/companies.jsonl -g example/graphml.properties -f JSONL -prov abc123
+	java -cp mapper-1.1.jar uk.gov.nca.graph.mapper.cli.MapDataToGraph -c example/companies/companies.map -d example/companies/companies.jsonl -g example/graphml.properties -f JSONL -prov abc123
 	
 If you are using the SQL format, you must include the necessary SQL driver on the classpath. For example:
 
-	java -classpath .:mapper-1.0.jar:postgresql-42.1.4.jar uk.gov.nca.graph.mapper.cli.MapDataToGraph -c example/companies/companies.map -d jdbc:postgresql://localhost:5432/example -t companies -g example/graphml.properties -f SQL
+	java -classpath .:mapper-1.1.jar:postgresql-42.1.4.jar uk.gov.nca.graph.mapper.cli.MapDataToGraph -c example/companies/companies.map -d jdbc:postgresql://localhost:5432/example -t companies -g example/graphml.properties -f SQL
 
 ## Generating Files
 
@@ -38,7 +38,7 @@ An additional tool is provided to create sample graphs using a mapping file, for
 
 To run the tool, use the following command:
 
-	java -cp mapper-1.0.jar uk.gov.nca.graph.mapper.cli.GenerateGraphFromMap
+	java -cp mapper-1.1.jar uk.gov.nca.graph.mapper.cli.GenerateGraphFromMap
 	
 This will display a help message detailing the available options.
 
