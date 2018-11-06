@@ -1,0 +1,4 @@
+vertices:
+- _type: DiscussionForumPosting
+  headline: _STRING(headline)
+  text: _STRING(text)

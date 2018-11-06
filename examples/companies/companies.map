@@ -1,0 +1,13 @@
+vertices:
+- _type: Person
+  _id: 1
+  name: _STRING(name)
+  birthDate: _DATE(birth)
+- _type: Company
+  _id: 2
+  name: _STRING(company)
+
+edges:
+- _type: worksFor
+  _src: 1
+  _tgt: 2

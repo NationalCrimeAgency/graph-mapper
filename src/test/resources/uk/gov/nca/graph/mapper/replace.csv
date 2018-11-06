@@ -1,0 +1,5 @@
+id,user_id,latest_username,old_username,new_username,time
+1,42,ArthurDent,DouglasAdams,Douggie,100
+2,42,ArthurDent,Douggie,Dent,150
+3,42,ArthurDent,Dent,DouglasAdams,200
+4,42,ArthurDent,DouglasAdams,ArthurDent,250

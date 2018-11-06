@@ -1,0 +1,26 @@
+filters:
+  _exists: name
+  nationality:
+  - British
+  - French
+
+vertices:
+- _id: 1
+  _type: Person
+  name: _STRING(1)
+  dateOfBirth: _DATE(3)
+  gender: _STRING(2)
+  source: example.txt
+- _id: 2
+  _type: Person
+  _merge: true
+  name:
+  - _STRING(4)
+  - " "
+  - _STRING(5)
+
+edges:
+- _type: parentOf
+  _src: 1
+  _tgt: 2
+

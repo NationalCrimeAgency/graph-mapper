@@ -1,0 +1,38 @@
+<chats>
+  <chat id="1">
+    <from>john@example.com</from>
+    <to>jane@example.com</to>
+    <to>sam@example.com</to>
+    <timestamp>2018-04-17T10:23:27Z</timestamp>
+    <message>Are you going to the pub later?</message>
+    <client>
+      <name type="client">My Messenger</name>
+      <version>2.6</version>
+    </client>
+  </chat>
+  <chat id="2">
+    <from>jane@example.com</from>
+    <to>john@example.com</to>
+    <timestamp>2018-04-17T10:23:58Z</timestamp>
+    <message>Yes I am, are you?</message>
+    <client>
+      <name type="browser">eMessenger</name>
+      <version>1.2</version>
+      <supports>
+        <format>json</format>
+        <format>csv</format>
+        <format>html</format>
+      </supports>
+    </client>
+  </chat>
+  <chat id="3">
+    <from>john@example.com</from>
+    <to>jane@example.com</to>
+    <timestamp>2018-04-17T10:24:17Z</timestamp>
+    <message>Yup, see you there!</message>
+    <client>
+      <name type="client">My Messenger</name>
+      <version>2.6</version>
+    </client>
+  </chat>
+</chats>

@@ -1,0 +1,20 @@
+vertices:
+- _type: Person
+  _id: 1
+  _merge: true
+  name:
+  - _STRING(1)
+  - " "
+  - _STRING(2)
+- _type: Location
+  _id: 2
+  _merge: true
+  street: _STRING(3)
+  city: _STRING(4)
+  state: _STRING(5)
+  zipCode: _STRING(6)
+
+edges:
+- _type: livesAt
+  _src: 1
+  _tgt: 2

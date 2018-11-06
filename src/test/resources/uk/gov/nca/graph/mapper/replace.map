@@ -1,0 +1,35 @@
+vertices:
+- _type: Person
+  _id: user
+  identifier:
+  - _LITERAL(user_account#)
+  - _INTEGER(user_id)
+  name: _STRING(latest_username)
+
+- _type: Person
+  _id: person_old
+  _merge: true
+  name: _STRING(old_username)
+
+- _type: Person
+  _id: person_new
+  _merge: true
+  name: _STRING(new_username)
+
+- _type: ReplaceAction
+  _id: update
+  startTime: _DATETIME(time)
+  endTime: _DATETIME(time)
+
+edges:
+- _type: agent
+  _src: update
+  _tgt: user
+
+- _type: replacee
+  _src: update
+  _tgt: person_old
+
+- _type: replacer
+  _src: update
+  _tgt: person_new
