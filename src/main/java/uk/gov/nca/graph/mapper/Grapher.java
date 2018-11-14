@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -81,21 +82,48 @@ public class Grapher {
     }
 
     /**
+     * Perform mapping and add data to graph.
+     *
+     * Optionally, the data can be flattened (see {@link #flattenMap(Map)}).
+     */
+    public void addDataToGraph(Map<String, Object> data, Graph graph, boolean flatten){
+        addDataToGraph(data, graph, Collections.emptyMap(), flatten);
+    }
+
+    /**
      * Perform mapping and add data to graph, adding the contents of auditData
      * to every vertex and edge. Audit data will override any data from the
      * mapping file, and any existing data in the graph.
      */
     public void addDataToGraph(Map<String, Object> data, Graph graph, Map<String, Object> auditData){
+        addDataToGraph(data, graph, auditData, false);
+    }
+
+    /**
+     * Perform mapping and add data to graph, adding the contents of auditData
+     * to every vertex and edge. Audit data will override any data from the
+     * mapping file, and any existing data in the graph.
+     *
+     * Optionally, the data can be flattened (see {@link #flattenMap(Map)}).
+     */
+    public void addDataToGraph(Map<String, Object> data, Graph graph, Map<String, Object> auditData, boolean flatten){
         Map<Object, Vertex> vertexMap = new HashMap<>();
+
+        Map<String, Object> processedData;
+        if(flatten){
+            processedData = flattenMap(data);
+        }else{
+            processedData = data;
+        }
 
         //First process vertices
         for(VertexMap vm : configuration.getVertices()){
             //Should we skip?
-            if(shouldSkip(data, vm))
+            if(shouldSkip(processedData, vm))
                 continue;
 
             //Get properties
-            Map<String, Object> properties = getProperties(data, vm, configuration.isLenient());
+            Map<String, Object> properties = getProperties(processedData, vm, configuration.isLenient());
 
             //Add vertices
             Vertex v;
@@ -144,6 +172,53 @@ public class Grapher {
             }
         }
     }
+
+    /**
+     * Flatten a nested map so that nested properties can be referenced in the mapping configuration.
+     *
+     * For instance, a map of form:
+     *
+     * {
+     *   "a": 1,
+     *   "b": {
+     *     "c": 2
+     *   }
+     * }
+     *
+     * would become
+     *
+     * {
+     *   "a": 1,
+     *   "b.c": 2
+     * }
+     *
+     */
+    public static Map<String, Object> flattenMap(Map<String, Object> nestedMap){
+        return flattenMap(nestedMap, "");
+    }
+
+    private static Map<String, Object> flattenMap(Map<String, Object> nestedMap, String prefix){
+        Map<String, Object> ret = new HashMap<>();
+
+        for(Entry<String, Object> entry : nestedMap.entrySet()){
+            if(entry.getValue() instanceof Map){
+                try {
+                    Map<String, Object> m = flattenMap(
+                        (Map<String, Object>) entry.getValue(), prefix + entry.getKey() + ".");
+
+                    ret.putAll(m);
+                }catch (ClassCastException cce){
+                    //Can't cast to Map<String, Object> - so we'll just added it as a value
+                    ret.put(prefix + entry.getKey(), entry.getValue());
+                }
+            }else{
+                ret.put(prefix + entry.getKey(), entry.getValue());
+            }
+        }
+
+        return ret;
+    }
+
 
     private static boolean shouldSkip(Map<String, Object> data, VertexMap vertexMap){
         for(Map.Entry<String, Mapping> e : vertexMap.getExcept().entrySet()){

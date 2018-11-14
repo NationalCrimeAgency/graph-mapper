@@ -233,7 +233,7 @@ public class GrapherTest {
         //Add an existing node
         graph.addVertex(T.label, "Object", "object.name", "box", "object.colour", "red");
 
-        //Configure a map that adds one person
+        //Configure a map that adds one object
         Configuration conf = new Configuration();
 
         VertexMap vm = new VertexMap();
@@ -259,6 +259,47 @@ public class GrapherTest {
         Vertex v = vertices.get(0);
         assertEquals("box", v.property("object.name").value());
         assertEquals("red", v.property("object.colour").value());
+
+        graph.close();
+    }
+
+    @Test
+    public void testNested() throws Exception{
+        Graph graph = TinkerGraph.open();
+
+        //Configure a map that adds one person
+        Configuration conf = new Configuration();
+
+        VertexMap vm = new VertexMap();
+        vm.setType("Person");
+        vm.setId("person1");
+        vm.setProperty("name", Arrays.asList(new Mapping(DataType.STRING, "name")));
+        vm.setProperty("age", Arrays.asList(new Mapping(DataType.INTEGER, "details.age")));
+        vm.setProperty("gender", Arrays.asList(new Mapping(DataType.STRING, "details.gender")));
+
+        conf.getVertices().add(vm);
+
+        //Add new data to graph, should merge with existing node as the properties will be the same
+        Grapher grapher = new Grapher(conf);
+
+        Map<String, Object> details = new HashMap<>();
+        details.put("age", 30);
+        details.put("gender", "male");
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Nathan");
+        data.put("details", details);
+
+        grapher.addDataToGraph(data, graph, true);
+
+        //Check that we still have one node, but with both sets of data
+        List<Vertex> vertices = graph.traversal().V().toList();
+        assertEquals(1, vertices.size());
+
+        Vertex v = vertices.get(0);
+        assertEquals("Nathan", v.property("name").value());
+        assertEquals(30, v.property("age").value());
+        assertEquals("male", v.property("gender").value());
 
         graph.close();
     }
@@ -359,5 +400,75 @@ public class GrapherTest {
         assertEquals(1, vertices.size());
 
         graph.close();
+    }
+
+    @Test
+    public void testFlattenMap(){
+        Map<String, Object> nested1 = new HashMap<>();
+        nested1.put("a", 1);
+        nested1.put("b", 2);
+
+        Map<String, Object> nested2 = new HashMap<>();
+        nested2.put("a", 3);
+        nested2.put("b", 4);
+        nested2.put("c", nested1);
+
+        Map<String, Object> nested3 = new HashMap<>();
+        nested3.put("a", 5);
+        nested3.put("b", 6);
+        nested3.put("c", nested2);
+
+        /*
+        We want the following structure:
+        nested3 = {
+            a: 5,
+            b: 6,
+            c.a: 3,
+            c.b: 4,
+            c.c.a: 1,
+            c.c.b: 2
+        }
+         */
+
+        Map<String, Object> flat = Grapher.flattenMap(nested3);
+
+        assertEquals(6, flat.size());
+        assertEquals(1, flat.get("c.c.a"));
+        assertEquals(2, flat.get("c.c.b"));
+        assertEquals(3, flat.get("c.a"));
+        assertEquals(4, flat.get("c.b"));
+        assertEquals(5, flat.get("a"));
+        assertEquals(6, flat.get("b"));
+    }
+
+    @Test
+    public void testFlattenMapException(){
+        Map<Integer, Object> nested1 = new HashMap<>();
+        nested1.put(1, 1);
+        nested1.put(2, 2);
+
+        Map<String, Object> nested2 = new HashMap<>();
+        nested2.put("a", 3);
+        nested2.put("b", 4);
+        nested2.put("c", nested1);
+
+        /*
+        We expect the following structure:
+        nested2 = {
+            a: 3,
+            b: 4,
+            c: {
+                1: 1
+                2: 2
+            }
+        }
+         */
+
+        Map<String, Object> flat = Grapher.flattenMap(nested2);
+
+        assertEquals(3, flat.size());
+        assertEquals(nested1, flat.get("c"));
+        assertEquals(3, flat.get("a"));
+        assertEquals(4, flat.get("b"));
     }
 }

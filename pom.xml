@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>mapper</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <name>Graph Mapper</name>
   <description>Tools for mapping structured data (e.g. a CSV file) into a network graph format</description>
   <url>https://github.com/NationalCrimeAgency/graph-mapper</url>
