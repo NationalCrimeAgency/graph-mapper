@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.Test;
@@ -181,6 +182,83 @@ public class GrapherTest {
 
         vertices = graph.traversal().V().toList();
         assertEquals(2, vertices.size());
+
+        graph.close();
+    }
+
+    @Test
+    public void testMergeWithExistingOnIdentifier() throws Exception{
+        Graph graph = TinkerGraph.open();
+
+        //Add an existing node
+        graph.addVertex(T.label, "Person", "identifier", "person.123", "gender", "Female");
+
+        //Configure a map that adds one person
+        Configuration conf = new Configuration();
+
+        VertexMap vm = new VertexMap();
+        vm.setType("Person");
+        vm.setId("person1");
+        vm.setProperty("name", Arrays.asList(new Mapping(DataType.STRING, "name")));
+        vm.setProperty("identifier", Arrays.asList(new Mapping(
+            DataType.LITERAL, "person."), new Mapping(DataType.INTEGER, "id")));
+
+        conf.getVertices().add(vm);
+
+        //Add new data to graph, should merge with existing node as the identifier will be the same
+        Grapher grapher = new Grapher(conf);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Anna");
+        data.put("id", 123);
+
+        grapher.addDataToGraph(data, graph);
+
+        //Check that we still have one node, but with both sets of data
+        List<Vertex> vertices = graph.traversal().V().toList();
+        assertEquals(1, vertices.size());
+
+        Vertex v = vertices.get(0);
+        assertEquals("person.123", v.property("identifier").value());
+        assertEquals("Anna", v.property("name").value());
+        assertEquals("Female", v.property("gender").value());
+
+        graph.close();
+    }
+
+    @Test
+    public void testMergeOnDottedProperty() throws Exception{
+        Graph graph = TinkerGraph.open();
+
+        //Add an existing node
+        graph.addVertex(T.label, "Object", "object.name", "box", "object.colour", "red");
+
+        //Configure a map that adds one person
+        Configuration conf = new Configuration();
+
+        VertexMap vm = new VertexMap();
+        vm.setType("Object");
+        vm.setId("obj1");
+        vm.setProperty("object.name", Arrays.asList(new Mapping(DataType.STRING, "name")));
+        vm.setMerge(true);
+
+        conf.getVertices().add(vm);
+
+        //Add new data to graph, should merge with existing node as the properties will be the same
+        Grapher grapher = new Grapher(conf);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "box");
+
+        grapher.addDataToGraph(data, graph);
+
+        //Check that we still have one node, but with both sets of data
+        List<Vertex> vertices = graph.traversal().V().toList();
+        assertEquals(1, vertices.size());
+
+        Vertex v = vertices.get(0);
+        assertEquals("box", v.property("object.name").value());
+        assertEquals("red", v.property("object.colour").value());
 
         graph.close();
     }
