@@ -16,7 +16,6 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.http.HttpHost;
@@ -68,6 +67,7 @@ public class MapDataToGraph {
     options.addOption("u", "username", true, "Username for SQL connections");   //TODO: Move this into a configuration file?
     options.addOption("p", "password", true, "Password for SQL connections");   //TODO: Move this into a configuration file?
     options.addOption("prov", true, "Provenance key to add to all data");
+    options.addOption("a", "flatten", false, "Flatten data from nested format");
     CommandLine cmd = parseCommandLine(options, args);
 
     if(cmd == null)
@@ -105,6 +105,8 @@ public class MapDataToGraph {
     Grapher grapher = new Grapher(conf);
     grapher.addIndex(g);
 
+    boolean flatten = cmd.hasOption('a');
+
     long count = 0;
     if(dataSource != null){
       while(dataSource.hasNext()){
@@ -115,7 +117,7 @@ public class MapDataToGraph {
         Map<String, Object> data = dataSource.next();
 
         if (conf.matchesFilters(data))
-          grapher.addDataToGraph(data, g, auditData);
+          grapher.addDataToGraph(data, g, auditData, flatten);
       }
     }
     LOGGER.info("Done loading data into graph - {} data records loaded", count);
