@@ -7,7 +7,7 @@
   <parent>
     <groupId>uk.gov.nca.graph</groupId>
     <artifactId>parent</artifactId>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>mapper</artifactId>

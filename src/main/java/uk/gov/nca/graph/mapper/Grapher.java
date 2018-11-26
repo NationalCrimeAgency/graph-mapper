@@ -219,7 +219,6 @@ public class Grapher {
         return ret;
     }
 
-
     private static boolean shouldSkip(Map<String, Object> data, VertexMap vertexMap){
         for(Map.Entry<String, Mapping> e : vertexMap.getExcept().entrySet()){
             Object val = data.get(e.getKey());
