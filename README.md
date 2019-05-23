@@ -1,3 +1,5 @@
+# This project is currently unmaintained. Please use with caution.
+
 # Graph Mapper
 
 This tool maps from a structured data source (e.g. CSV or JSON-lines) to a graph format (e.g. GraphML, or directly into a Gremlin database). It is fully configurable, and designed to be schema-agnostic.
